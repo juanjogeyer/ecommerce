@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # Servicio de base de datos
+  db:
+    image: postgres:13
+    container_name: ecommerce-microservices-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ecommerce
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    ports:
+      - "5432:5432"
+
+  # Microservicio de Catálogo
+  catalogo:
+    build:
+      context: ./ms-catalogo
+    container_name: ecommerce-microservices-catalogo
+    environment:
+      - FLASK_ENV=development
+      - SQLALCHEMY_DATABASE_URI=postgresql://user:password@db:5432/ecommerce
+    ports:
+      - "5001:5001"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - db
+
+  # Microservicio de Compras
+  compras:
+    build:
+      context: ./ms-compras
+    container_name: ecommerce-microservices-compras
+    environment:
+      - FLASK_ENV=development
+      - SQLALCHEMY_DATABASE_URI=postgresql://user:password@db:5432/ecommerce
+    ports:
+      - "5002:5002"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - db
+
+networks:
+  ecommerce-network:
+    driver: bridge
+
+volumes:
+  db_data:
