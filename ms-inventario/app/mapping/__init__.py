@@ -1,3 +1,3 @@
 from .response_schema import ResponseSchema
-from .inventario_schema import InventarioSchema
+from .stock_schema import StockSchema
 from .response_message import ResponseMessage

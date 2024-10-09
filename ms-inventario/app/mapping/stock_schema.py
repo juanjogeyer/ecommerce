@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, post_load
-from app.model import Inventario
+from app.model import Stock
 
-class InventarioSchema(Schema):
+class StockSchema(Schema):
     id = fields.Integer(dump_only=True)
     producto_id = fields.Integer(required=True)
     fecha_transaccion = fields.DateTime(required=True)
@@ -9,5 +9,5 @@ class InventarioSchema(Schema):
     entrada_salida = fields.Integer(required=True)  # 1: entrada, 2: salida
 
     @post_load
-    def make_inventario(self, data, **kwargs):
-        return Inventario(**data)
+    def make_stock(self, data, **kwargs):
+        return Stock(**data)

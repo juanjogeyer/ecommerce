@@ -1,13 +1,22 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
+from typing import List
 from app import db
-from app.model import Inventario
+from app.model import Stock
 
-class InventarioRepository:
+class StockRepository:
 
-    def update_stock(self, producto_id: int, cantidad: float, tipo_transaccion: int) -> Inventario:
+    def all(self) -> List[Stock]:
+        return db.session.query(Stock).all()
+
+    def add(self, stock: Stock) -> Stock:
+        db.session.add(stock)
+        db.session.commit()
+        return stock
+
+    def update(self, producto_id: int, cantidad: float, tipo_transaccion: int) -> Stock:
         #Actualiza el stock de un producto agregando una transacción de entrada (1) o salida (2).
-        transaccion = Inventario(
+        transaccion = Stock(
             producto_id=producto_id,
             cantidad=cantidad,
             entrada_salida=tipo_transaccion
@@ -21,16 +30,10 @@ class InventarioRepository:
             db.session.rollback()
             raise
     
-    def get_stock(self, producto_id: int) -> float:
-        #Obtiene el stock actual de un producto sumando todas las transacciones de entrada y salida.
-        #Las entradas suman al stock y las salidas restan del stock.
-        stock_actual = db.session.query(
-            func.sum(
-                func.case(
-                    [(Inventario.entrada_salida == 1, Inventario.cantidad),
-                     (Inventario.entrada_salida == 2, -Inventario.cantidad)]
-                )
-            )
-        ).filter(Inventario.producto_id == producto_id).scalar()
-
-        return stock_actual or 0.0  # Retorna 0 si no hay transacciones
+    def delete(self, stock: Stock) -> None:
+        db.session.delete(stock)
+        db.session.commit()
+        return None
+    
+    def find(self, id: int) -> Stock:
+        return db.session.query(Stock).filter(Stock.id == id).one_or_none()

@@ -18,7 +18,7 @@ def create_app():
     migrate.init_app(app, db)
 
     with app.app_context():
-        from app.route import inventario
-        app.register_blueprint(inventario)
+        from app.route import inventario_bp
+        app.register_blueprint(inventario_bp)
 
     return app
