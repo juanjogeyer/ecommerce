@@ -9,17 +9,28 @@ pago_service = PagoService()
 pago_schema = PagoSchema()
 response_schema = ResponseSchema()
 
+@pago_bp.route('/pagos', methods=['GET'])
+def index():
+    response_builder = ResponseBuilder()
+    data = pago_schema.dump(pago_service.all(), many=True)
+    response_builder.add_message("Pagos found").add_status_code(200).add_data(data)
+    return response_schema.dump(response_builder.build()), 200
+
 @pago_bp.route('/pagos/add', methods=['POST'])
-def add_pago():
+def add():
     response_builder = ResponseBuilder()
     pago = pago_schema.load(request.json)
-    data = pago_schema.dump(pago_service.save(pago))
+    data = pago_schema.dump(pago_service.add(pago))
     response_builder.add_message("Pago creado").add_status_code(201).add_data(data)
     return response_schema.dump(response_builder.build()), 201
 
 @pago_bp.route('/pagos/<int:id>', methods=['DELETE'])
-def delete_pago(id):
-    pago_service.delete(id)
+def delete(id):
     response_builder = ResponseBuilder()
-    response_builder.add_message("Pago eliminado").add_status_code(200).add_data({'id': id})
-    return response_schema.dump(response_builder.build()), 200
+    data = pago_service.delete(id)
+    if data:
+        response_builder.add_message("Pago deleted").add_status_code(200).add_data({'id': id})
+        return response_schema.dump(response_builder.build()), 200
+    else:
+        response_builder.add_message("Pago not found").add_status_code(404).add_data({'id': id})
+        return response_schema.dump(response_builder.build()), 404
