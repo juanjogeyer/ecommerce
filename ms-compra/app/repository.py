@@ -4,10 +4,14 @@ from app.model import Compra
 
 class CompraRepository:
 
-    def add_compra(self, compra: Compra) -> Compra:
+    def add(self, compra: Compra) -> Compra:
         db.session.add(compra)
         db.session.commit()
         return compra
 
     def all(self) -> List[Compra]:
-        return Compra.query.all()
+        return db.session.query(Compra).all()
+
+    def delete(self, compra: Compra):
+        db.session.delete(compra)
+        db.session.commit()

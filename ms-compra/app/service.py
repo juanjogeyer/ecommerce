@@ -6,8 +6,16 @@ repository = CompraRepository()
 
 class CompraService:
 
-    def add_compra(self, compra: Compra) -> Compra:
-        return repository.add_compra(compra)
+    def add(self, compra: Compra) -> Compra:
+        return repository.add(compra)
 
     def all(self) -> List[Compra]:
         return repository.all()
+
+    def delete(self, id: int) -> bool:
+        compra = self.find(id)
+        if compra:
+            repository.delete(compra)
+            return True
+        else:
+            return False
